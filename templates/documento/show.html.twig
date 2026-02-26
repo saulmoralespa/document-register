@@ -1,0 +1,64 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ documento.nombre }} - Document Register{% endblock %}
+
+{% block body %}
+<div style="max-width: 900px; margin: 0 auto; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1>Detalle del Documento</h1>
+        <a href="{{ path('app_documento_index') }}" style="padding: 8px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px;">
+            ← Volver al listado
+        </a>
+    </div>
+
+    <div style="background-color: white; padding: 30px; border: 1px solid #ddd; border-radius: 5px;">
+        <div style="margin-bottom: 30px;">
+            <div style="display: inline-block; padding: 5px 15px; background-color: #007bff; color: white; border-radius: 4px; font-weight: bold; font-size: 1.2em;">
+                {{ documento.codigo }}
+            </div>
+        </div>
+
+        <div style="margin-bottom: 25px;">
+            <label style="display: block; color: #6c757d; font-size: 0.9em; margin-bottom: 5px;">NOMBRE DEL DOCUMENTO</label>
+            <h2 style="margin: 0; font-size: 1.5em;">{{ documento.nombre }}</h2>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+            <div>
+                <label style="display: block; color: #6c757d; font-size: 0.9em; margin-bottom: 5px;">TIPO DE DOCUMENTO</label>
+                <div style="padding: 10px; background-color: #f8f9fa; border-left: 4px solid #28a745; border-radius: 4px;">
+                    <strong>{{ documento.tipo.nombre }}</strong>
+                    <br>
+                    <small style="color: #6c757d;">Prefijo: {{ documento.tipo.prefijo }}</small>
+                </div>
+            </div>
+            <div>
+                <label style="display: block; color: #6c757d; font-size: 0.9em; margin-bottom: 5px;">PROCESO</label>
+                <div style="padding: 10px; background-color: #f8f9fa; border-left: 4px solid #17a2b8; border-radius: 4px;">
+                    <strong>{{ documento.proceso.nombre }}</strong>
+                    <br>
+                    <small style="color: #6c757d;">Prefijo: {{ documento.proceso.prefijo }}</small>
+                </div>
+            </div>
+        </div>
+
+        <div style="margin-bottom: 30px;">
+            <label style="display: block; color: #6c757d; font-size: 0.9em; margin-bottom: 5px;">CONTENIDO</label>
+            <div style="padding: 15px; background-color: #f8f9fa; border: 1px solid #dee2e6; border-radius: 4px; white-space: pre-wrap; line-height: 1.6;">{{ documento.contenido }}</div>
+        </div>
+
+        <div style="display: flex; gap: 10px; padding-top: 20px; border-top: 1px solid #dee2e6;">
+            <a href="{{ path('app_documento_edit', {id: documento.id}) }}" style="flex: 1; padding: 12px; background-color: #ffc107; color: #212529; text-decoration: none; border-radius: 4px; text-align: center; font-weight: bold;">
+                Editar Documento
+            </a>
+            <form method="post" action="{{ path('app_documento_delete', {id: documento.id}) }}" style="flex: 1;" onsubmit="return confirm('¿Está seguro de eliminar este documento? Esta acción no se puede deshacer.');">
+                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ documento.id) }}">
+                <button type="submit" style="width: 100%; padding: 12px; background-color: #dc3545; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                    Eliminar Documento
+                </button>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

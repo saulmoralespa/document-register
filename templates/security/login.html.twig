@@ -1,0 +1,58 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Iniciar Sesión - Document Register{% endblock %}
+
+{% block body %}
+<div style="max-width: 400px; margin: 50px auto; padding: 20px; border: 1px solid #ddd; border-radius: 5px;">
+    <h1 style="text-align: center; margin-bottom: 30px;">Document Register</h1>
+    <h2 style="text-align: center; font-size: 1.2em; margin-bottom: 30px;">Iniciar Sesión</h2>
+
+    {% if error %}
+        <div class="alert error" style="padding: 10px; margin-bottom: 20px; background-color: #f8d7da; border: 1px solid #f5c6cb; border-radius: 4px; color: #721c24;">
+            {{ error.messageKey|trans(error.messageData, 'security') }}
+        </div>
+    {% endif %}
+
+    <form method="post" action="{{ path('app_login') }}">
+        <div style="margin-bottom: 15px;">
+            <label for="username" style="display: block; margin-bottom: 5px; font-weight: bold;">Usuario:</label>
+            <input
+                type="text"
+                id="username"
+                name="_username"
+                value="{{ last_username }}"
+                required
+                autofocus
+                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;"
+            >
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            <label for="password" style="display: block; margin-bottom: 5px; font-weight: bold;">Contraseña:</label>
+            <input
+                type="password"
+                id="password"
+                name="_password"
+                required
+                style="width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;"
+            >
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}">
+
+        <button
+            type="submit"
+            style="width: 100%; padding: 10px; background-color: #007bff; color: white; border: none; border-radius: 4px; font-size: 1em; cursor: pointer;"
+        >
+            Iniciar Sesión
+        </button>
+    </form>
+
+    <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 4px; font-size: 0.9em;">
+        <strong>Credenciales de prueba:</strong><br>
+        Usuario: <code>admin</code><br>
+        Contraseña: <code>admin123</code>
+    </div>
+</div>
+{% endblock %}
+

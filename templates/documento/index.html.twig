@@ -1,0 +1,94 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Documentos - Document Register{% endblock %}
+
+{% block body %}
+<div style="max-width: 1200px; margin: 0 auto; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <h1>Registro de Documentos</h1>
+        <div>
+            <span style="margin-right: 15px;">Usuario: <strong>{{ app.user.userIdentifier }}</strong></span>
+            <a href="{{ path('app_logout') }}" style="padding: 8px 15px; background-color: #dc3545; color: white; text-decoration: none; border-radius: 4px;">
+                Cerrar Sesión
+            </a>
+        </div>
+    </div>
+
+    <div style="margin-bottom: 20px; display: flex; gap: 10px;">
+        <form method="get" action="{{ path('app_documento_index') }}" style="flex: 1; display: flex; gap: 10px;">
+            <input
+                type="text"
+                name="q"
+                value="{{ query }}"
+                placeholder="Buscar por nombre o código..."
+                style="flex: 1; padding: 8px; border: 1px solid #ddd; border-radius: 4px;"
+            >
+            <button
+                type="submit"
+                style="padding: 8px 20px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer;"
+            >
+                Buscar
+            </button>
+            {% if query %}
+                <a
+                    href="{{ path('app_documento_index') }}"
+                    style="padding: 8px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; display: inline-block;"
+                >
+                    Limpiar
+                </a>
+            {% endif %}
+        </form>
+        <a
+            href="{{ path('app_documento_new') }}"
+            style="padding: 8px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 4px; white-space: nowrap;"
+        >
+            + Nuevo Documento
+        </a>
+    </div>
+
+    {% if documentos is empty %}
+        <div style="padding: 40px; text-align: center; background-color: #f8f9fa; border-radius: 4px;">
+            {% if query %}
+                <p>No se encontraron documentos que coincidan con "{{ query }}"</p>
+            {% else %}
+                <p>No hay documentos registrados. Crea tu primer documento usando el botón "+ Nuevo Documento"</p>
+            {% endif %}
+        </div>
+    {% else %}
+        <table style="width: 100%; border-collapse: collapse; background-color: white; border: 1px solid #ddd;">
+            <thead>
+                <tr style="background-color: #f8f9fa;">
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Código</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Nombre</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Tipo</th>
+                    <th style="padding: 12px; text-align: left; border-bottom: 2px solid #ddd;">Proceso</th>
+                    <th style="padding: 12px; text-align: center; border-bottom: 2px solid #ddd; width: 150px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for documento in documentos %}
+                    <tr style="border-bottom: 1px solid #ddd;">
+                        <td style="padding: 12px;"><strong>{{ documento.codigo }}</strong></td>
+                        <td style="padding: 12px;">{{ documento.nombre }}</td>
+                        <td style="padding: 12px;">{{ documento.tipo.nombre }}</td>
+                        <td style="padding: 12px;">{{ documento.proceso.nombre }}</td>
+                        <td style="padding: 12px; text-align: center;">
+                            <a href="{{ path('app_documento_show', {id: documento.id}) }}" style="color: #007bff; text-decoration: none; margin: 0 5px;">Ver</a>
+                            <a href="{{ path('app_documento_edit', {id: documento.id}) }}" style="color: #ffc107; text-decoration: none; margin: 0 5px;">Editar</a>
+                            <form method="post" action="{{ path('app_documento_delete', {id: documento.id}) }}" style="display: inline;" onsubmit="return confirm('¿Está seguro de eliminar este documento?');">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ documento.id) }}">
+                                <button type="submit" style="color: #dc3545; background: none; border: none; cursor: pointer; text-decoration: none; padding: 0; margin: 0 5px;">Eliminar</button>
+                            </form>
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div style="margin-top: 15px; color: #6c757d;">
+            Total: <strong>{{ documentos|length }}</strong> documento(s)
+        </div>
+    {% endif %}
+</div>
+{% endblock %}
+

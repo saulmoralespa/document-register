@@ -1,0 +1,73 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Editar Documento - Document Register{% endblock %}
+
+{% block body %}
+<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px;">
+        <div>
+            <h1>Editar Documento</h1>
+            <p style="color: #6c757d; margin: 5px 0 0 0;">Código actual: <strong>{{ documento.codigo }}</strong></p>
+        </div>
+        <a href="{{ path('app_documento_index') }}" style="padding: 8px 15px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px;">
+            ← Volver al listado
+        </a>
+    </div>
+
+    {% if app.flashes('info') %}
+        <div style="padding: 10px; margin-bottom: 20px; background-color: #d1ecf1; border: 1px solid #bee5eb; border-radius: 4px; color: #0c5460;">
+            {% for message in app.flashes('info') %}
+                {{ message }}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div style="background-color: white; padding: 30px; border: 1px solid #ddd; border-radius: 5px;">
+        {{ form_start(form) }}
+
+        <div style="margin-bottom: 20px;">
+            {{ form_label(form.nombre, null, {'label_attr': {'style': 'display: block; margin-bottom: 5px; font-weight: bold;'}}) }}
+            {{ form_widget(form.nombre, {'attr': {'style': 'width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;'}}) }}
+            {{ form_errors(form.nombre) }}
+            <small style="color: #6c757d; display: block; margin-top: 5px;">Máximo 60 caracteres</small>
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            {{ form_label(form.tipo, null, {'label_attr': {'style': 'display: block; margin-bottom: 5px; font-weight: bold;'}}) }}
+            {{ form_widget(form.tipo, {'attr': {'style': 'width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;'}}) }}
+            {{ form_errors(form.tipo) }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            {{ form_label(form.proceso, null, {'label_attr': {'style': 'display: block; margin-bottom: 5px; font-weight: bold;'}}) }}
+            {{ form_widget(form.proceso, {'attr': {'style': 'width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box;'}}) }}
+            {{ form_errors(form.proceso) }}
+        </div>
+
+        <div style="margin-bottom: 20px;">
+            {{ form_label(form.contenido, null, {'label_attr': {'style': 'display: block; margin-bottom: 5px; font-weight: bold;'}}) }}
+            {{ form_widget(form.contenido, {'attr': {'style': 'width: 100%; padding: 8px; border: 1px solid #ddd; border-radius: 4px; box-sizing: border-box; font-family: inherit;'}}) }}
+            {{ form_errors(form.contenido) }}
+            <small style="color: #6c757d; display: block; margin-top: 5px;">Máximo 4000 caracteres</small>
+        </div>
+
+        <div style="padding: 15px; background-color: #fff3cd; border-left: 4px solid #ffc107; margin-bottom: 20px;">
+            <strong>⚠️ Importante:</strong> Si cambias el Tipo o el Proceso, el código del documento será recalculado automáticamente.
+            <br>
+            <small>El nuevo código se generará basado en la nueva combinación Tipo-Proceso.</small>
+        </div>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" style="flex: 1; padding: 12px; background-color: #ffc107; color: #212529; border: none; border-radius: 4px; font-size: 1em; cursor: pointer; font-weight: bold;">
+                Guardar Cambios
+            </button>
+            <a href="{{ path('app_documento_index') }}" style="flex: 1; padding: 12px; background-color: #6c757d; color: white; text-decoration: none; border-radius: 4px; text-align: center; display: block;">
+                Cancelar
+            </a>
+        </div>
+
+        {{ form_end(form) }}
+    </div>
+</div>
+{% endblock %}
+
