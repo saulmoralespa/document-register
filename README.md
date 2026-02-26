@@ -55,7 +55,8 @@ php bin/console doctrine:fixtures:load
 
 # 5. Iniciar servidor de desarrollo
 symfony server:start
-# O si no tienes Symfony CLI: php -S localhost:8000 -t public/
+# O si no tienes Symfony CLI: 
+php -S localhost:8000 -t public/
 
 # 6. Acceder a http://localhost:8000
 # Usuario: admin | Contraseña: admin123
@@ -321,7 +322,7 @@ El proyecto incluye configuración de **GitHub Actions** para ejecutar automáti
 
 ### 📊 Ejecución del CI
 El CI se ejecuta automáticamente en:
-- Push a ramas `main`, `master` o `develop`
+- Push a ramas `main`
 - Pull Requests a estas ramas
 
 ### 🚀 Ejecutar Tests Localmente
