@@ -48,17 +48,19 @@ cp .env.local.example .env.local
 # 3. Iniciar base de datos con Docker
 docker compose up -d
 
-# 4. Crear base de datos y ejecutar migraciones
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
-php bin/console doctrine:fixtures:load
+# 4. Esperar a que MySQL esté listo (15-20 segundos)
+sleep 20
 
-# 5. Iniciar servidor de desarrollo
-symfony server:start
-# O si no tienes Symfony CLI: 
+# 5. Ejecutar migraciones (la base de datos 'app' se crea automáticamente)
+php bin/console doctrine:migrations:migrate --no-interaction
+
+# 6. Cargar datos iniciales (usuario admin, procesos y tipos)
+php bin/console doctrine:fixtures:load --no-interaction
+
+# 7. Iniciar servidor de desarrollo
 php -S localhost:8000 -t public/
 
-# 6. Acceder a http://localhost:8000
+# 8. Acceder a http://localhost:8000
 # Usuario: admin | Contraseña: admin123
 ```
 
@@ -135,16 +137,20 @@ document-register-mailer-1    "/mailpit"               mailer     Up
 
 ### 5. Crear la base de datos y ejecutar migraciones
 
+**Nota:** La base de datos `app` se crea automáticamente al iniciar el contenedor Docker, por lo que no necesitas ejecutar `doctrine:database:create`.
+
 ```bash
-# Crear la base de datos
-php bin/console doctrine:database:create
-
 # Ejecutar las migraciones (crear tablas)
-php bin/console doctrine:migrations:migrate
+php bin/console doctrine:migrations:migrate --no-interaction
 
-# Cargar datos iniciales (procesos y tipos de documentos)
-php bin/console doctrine:fixtures:load
+# Cargar datos iniciales (usuario admin, 5 procesos y 5 tipos de documentos)
+php bin/console doctrine:fixtures:load --no-interaction
 ```
+
+**Datos que se cargan:**
+- ✅ 1 usuario admin (admin/admin123)
+- ✅ 5 Procesos: Ingeniería, Recursos Humanos, Finanzas, Operaciones, Calidad
+- ✅ 5 Tipos de Documentos: Instructivo, Procedimiento, Manual, Formato, Registro
 
 ### 6. Iniciar el servidor de desarrollo
 
@@ -313,16 +319,16 @@ El proyecto incluye configuración de **GitHub Actions** para ejecutar automáti
 - Tests unitarios (Entidades, Servicios)
 - Tests de integración (Repositorios)
 - Tests funcionales (Controladores)
-- **85+ tests con 186+ assertions**
+- **85 tests con 189 assertions**
 
 ### ✅ Verificaciones de Calidad
 - Validación de sintaxis PHP
 - Validación de esquema Doctrine
-- Audit de seguridad de dependencias
+- Audit de seguridad de dependencias (composer audit)
 
 ### 📊 Ejecución del CI
 El CI se ejecuta automáticamente en:
-- Push a ramas `main`
+- Push a ramas `main`, `master`, `develop`
 - Pull Requests a estas ramas
 
 ### 🚀 Ejecutar Tests Localmente
@@ -331,25 +337,17 @@ El CI se ejecuta automáticamente en:
 # Todos los tests
 php bin/phpunit
 
+# Con formato testdox (más legible)
+php bin/phpunit --testdox
+
 # Tests por categoría
 php bin/phpunit tests/Entity/       # Tests unitarios
 php bin/phpunit tests/Service/      # Tests de servicios
 php bin/phpunit tests/Repository/   # Tests de repositorios
 php bin/phpunit tests/Controller/   # Tests funcionales
-
-# Con formato testdox (más legible)
-php bin/phpunit --testdox
-
-# Test específico
-php bin/phpunit tests/Service/CodigoGeneratorServiceTest.php
 ```
 
-### 📋 Requisitos del CI
-- **PHP:** 8.4+
-- **MySQL:** 8.0
-- **Composer:** 2.x
-
-Ver configuración completa en: `.github/workflows/ci.yml`
+**Configuración completa en:** `.github/workflows/ci.yml`
 
 ---
 
@@ -358,15 +356,14 @@ Ver configuración completa en: `.github/workflows/ci.yml`
 ### Crear un documento
 
 1. Inicia sesión con `admin` / `admin123`
-2. Ve a la página principal
-3. Haz clic en "Nuevo Documento"
-4. Completa el formulario:
+2. Haz clic en "Nuevo Documento"
+3. Completa el formulario:
    - **Nombre**: INSTRUCTIVO DE DESARROLLO
    - **Tipo**: Instructivo (INS)
    - **Proceso**: Ingeniería (ING)
    - **Contenido**: Descripción del instructivo...
-5. El sistema generará automáticamente el código: `INS-ING-1`
-6. Guarda el documento
+4. El sistema generará automáticamente el código: `INS-ING-1`
+5. Guarda el documento
 
 ### Editar un documento
 
@@ -376,26 +373,29 @@ Ver configuración completa en: `.github/workflows/ci.yml`
 
 ### Buscar documentos
 
+1. En la página principal, usa el campo de búsqueda
+2. Escribe parte del nombre o código del documento
+3. Haz clic en "Buscar"
+4. El sistema mostrará todos los documentos que coincidan
+
+### Eliminar un documento
+
+1. Desde la lista de documentos, haz clic en "Eliminar"
+2. Confirma la acción en el diálogo de confirmación
+3. El documento será eliminado permanentemente
+
+---
+
 ## 🐛 Solución de Problemas
 
 ### Archivo .env.local no encontrado
 
 Si al clonar el repositorio ves errores de configuración:
 
-```bash
-# Error común: "Environment variable not found"
-```
-
 **Solución:**
 ```bash
-# 1. Crear el archivo .env.local desde la plantilla
+# Crear el archivo .env.local desde la plantilla
 cp .env.local.example .env.local
-
-# 2. Verificar que el archivo se creó correctamente
-ls -la .env.local
-
-# 3. Editar si necesitas personalizar valores
-nano .env.local  # o usa tu editor preferido
 ```
 
 **Nota:** El archivo `.env.local` está en `.gitignore` y NO se incluye en el repositorio por seguridad.
@@ -404,44 +404,49 @@ nano .env.local  # o usa tu editor preferido
 
 ```bash
 # Verificar si el puerto 3308 está en uso
-netstat -tuln | grep 3308
+lsof -i :3308
 
 # Ver logs del contenedor
 docker compose logs database
 
 # Reiniciar contenedores
-docker compose down
-docker compose up -d
+docker compose down && docker compose up -d
 ```
 
 ### Error de conexión a la base de datos
 
 Verifica que:
-1. El contenedor de Docker esté corriendo: `docker compose ps`
+1. El contenedor esté corriendo: `docker compose ps`
 2. Las credenciales en `.env.local` sean correctas
-3. El puerto sea **3308** para conexiones desde el host (localhost)
-4. El contenedor esté escuchando correctamente:
-   ```bash
-   docker compose logs database
-   ```
+3. El puerto sea **3308** (no 3306)
+4. MySQL esté listo (espera 15-20 segundos después de iniciar)
 
 Para conectarte directamente a MySQL:
 ```bash
-# Desde el host (localhost)
-mysql -h 127.0.0.1 -P 3308 -u app -p
-# Password: !ChangeMe!
+# Desde el host
+mysql -h 127.0.0.1 -P 3308 -u app -p'!ChangeMe!'
 
 # O desde dentro del contenedor
-docker compose exec database mysql -u app -p
+docker compose exec database mysql -u app -p'!ChangeMe!' app
 ```
 
-### Problemas con migraciones
+### Reiniciar todo desde cero
 
 ```bash
-# Resetear la base de datos (⚠️ elimina todos los datos)
-php bin/console doctrine:database:drop --force
-php bin/console doctrine:database:create
-php bin/console doctrine:migrations:migrate
+# Detener y eliminar contenedores y volúmenes
+docker compose down -v
+
+# Iniciar contenedores
+docker compose up -d
+
+# Esperar a que MySQL esté listo
+sleep 20
+
+# Ejecutar migraciones
+php bin/console doctrine:migrations:migrate --no-interaction
+
+# Cargar datos iniciales
+php bin/console doctrine:fixtures:load --no-interaction
 ```
 
 ---
@@ -461,9 +466,6 @@ php bin/console doctrine:migrations:migrate
 
 Proyecto propietario para uso educativo/demostrativo.
 
-## 🤝 Contribuciones
-
-Este es un proyecto de demostración. No se aceptan contribuciones externas.
 
 ---
 

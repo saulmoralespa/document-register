@@ -7,24 +7,32 @@ use App\Entity\ProProceso;
 use App\Entity\TipTipoDoc;
 use Doctrine\Persistence\ObjectManager;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 class AppFixturesTest extends TestCase
 {
+    private function createFixture(): AppFixtures
+    {
+        $passwordHasher = $this->createMock(UserPasswordHasherInterface::class);
+        $passwordHasher->method('hashPassword')->willReturn('hashed_password');
+        return new AppFixtures($passwordHasher);
+    }
+
     public function testFixtureExists(): void
     {
-        $fixture = new AppFixtures();
+        $fixture = $this->createFixture();
         $this->assertInstanceOf(AppFixtures::class, $fixture);
     }
 
     public function testLoadMethodExists(): void
     {
-        $fixture = new AppFixtures();
+        $fixture = $this->createFixture();
         $this->assertTrue(method_exists($fixture, 'load'));
     }
 
     public function testLoadCreatesProProcesos(): void
     {
-        $fixture = new AppFixtures();
+        $fixture = $this->createFixture();
         $manager = $this->createMock(ObjectManager::class);
 
         // Should persist at least 5 ProProceso entities
@@ -49,7 +57,7 @@ class AppFixturesTest extends TestCase
 
     public function testLoadCreatesTipTipoDocs(): void
     {
-        $fixture = new AppFixtures();
+        $fixture = $this->createFixture();
         $manager = $this->createMock(ObjectManager::class);
 
         // Should persist at least 5 TipTipoDoc entities
@@ -74,7 +82,7 @@ class AppFixturesTest extends TestCase
 
     public function testLoadCreatesSpecificProcesos(): void
     {
-        $fixture = new AppFixtures();
+        $fixture = $this->createFixture();
         $manager = $this->createMock(ObjectManager::class);
 
         $persistedProcesos = [];
@@ -100,7 +108,7 @@ class AppFixturesTest extends TestCase
 
     public function testLoadCreatesSpecificTipos(): void
     {
-        $fixture = new AppFixtures();
+        $fixture = $this->createFixture();
         $manager = $this->createMock(ObjectManager::class);
 
         $persistedTipos = [];
